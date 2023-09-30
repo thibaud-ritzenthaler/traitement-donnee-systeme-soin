@@ -1,0 +1,12 @@
+---
+title: "Analyses des différents pays"
+format: html
+---
+
+## Problématique
+En quoi les crises des subprimes et de la zone euro ont impactée l'accès au soin des ménages ?
+
+## Hypothèses
+
+Les différents systèmes de santé impactent l'accès aux soin.
+Les pays les plus touchés par la crise sont dont l'accès au soin est le plus dégradé.
