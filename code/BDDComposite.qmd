@@ -1,5 +1,5 @@
 ---
-title: "Creation de la BDD coposite"
+title: "Creation de la BDD composite"
 format: html
 ---
 
@@ -8,13 +8,16 @@ Import des BDD
 library(tidyverse)
 # setwd("C:/Users/Tibo/Documents/Demographie/M2S1/UE4 - Traitement de données/traitement-donnee-systeme-soin")
 
+filter_base <- function(country) {
+    return(select(country, DB020, DB010, HS060, HS101, HI010, HI020, HI030, RB090, RB060, RB062, RB063, RB064, RB065, RB066, RB080, RB082, PB190, PE041, PH010, PH020, PH030, PH040, PH050, PH060, PH070, PW010))
+}
 
-DK = c(read_csv("data/DK/DK_2006p_EUSILC.csv"), read_csv("data/DK/DK_2007p_EUSILC.csv"), read_csv("data/DK/DK_2008p_EUSILC.csv"), read_csv("data/DK/DK_2009p_EUSILC.csv"), read_csv("data/DK/DK_2010p_EUSILC.csv"), read_csv("data/DK/DK_2011p_EUSILC.csv"), read_csv("data/DK/DK_2012p_EUSILC.csv"), read_csv("data/DK/DK_2013p_EUSILC.csv"))
-AT = c(read_csv("data/AT/AT_2006p_EUSILC.csv"), read_csv("data/AT/AT_2007p_EUSILC.csv"), read_csv("data/AT/AT_2008p_EUSILC.csv"), read_csv("data/AT/AT_2009p_EUSILC.csv"), read_csv("data/AT/AT_2010p_EUSILC.csv"), read_csv("data/AT/AT_2011p_EUSILC.csv"), read_csv("data/AT/AT_2012p_EUSILC.csv"), read_csv("data/AT/AT_2013p_EUSILC.csv"))
+DK <- c(filter_base(read_csv("data/DK/DK_2006p_EUSILC.csv")), read_csv("data/DK/DK_2007p_EUSILC.csv"), read_csv("data/DK/DK_2008p_EUSILC.csv"), read_csv("data/DK/DK_2009p_EUSILC.csv"), read_csv("data/DK/DK_2010p_EUSILC.csv"), read_csv("data/DK/DK_2011p_EUSILC.csv"), read_csv("data/DK/DK_2012p_EUSILC.csv"), read_csv("data/DK/DK_2013p_EUSILC.csv"))
+AT <- c(read_csv("data/AT/AT_2006p_EUSILC.csv"), read_csv("data/AT/AT_2007p_EUSILC.csv"), read_csv("data/AT/AT_2008p_EUSILC.csv"), read_csv("data/AT/AT_2009p_EUSILC.csv"), read_csv("data/AT/AT_2010p_EUSILC.csv"), read_csv("data/AT/AT_2011p_EUSILC.csv"), read_csv("data/AT/AT_2012p_EUSILC.csv"), read_csv("data/AT/AT_2013p_EUSILC.csv"))
 
 ```
 
-On garde les variables suivantes : 
+On garde les variables suivantes :
 DB020 : Pays de résidence
 DB010 : Année d'enquête
 HS060 : Capacité à faire face a une dépense imprévue
