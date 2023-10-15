@@ -1,0 +1,39 @@
+---
+title: "Analyse graphique"
+output: html_notebook
+---
+
+```{r import, include = F}
+library(tidyverse)
+library(questionr)
+
+# setwd("C:/Users/Tibo/Documents/Demographie/M2S1/UE4 - Traitement de donnees/traitement-donnee-systeme-soin/code")
+
+DK_people <- read_csv("../data/processed/DK_people.csv")
+DK_household <- read_csv("../data/processed/DK_household.csv")
+AT_people <- read_csv("../data/processed/AT_people.csv")
+AT_household <- read_csv("../data/processed/AT_household.csv")
+
+DK_people_agregate_PH040_unmet <- DK_people %>% filter(PH040 == 1) %>% group_by(ANREC, RB050) %>% summarise(nb = n()) %>% mutate(nb_pond = RB050*nb) %>% ungroup() %>% group_by(ANREC) %>% summarise(POND_NB_UNMET = sum(nb_pond))
+DK_people_agregate_PH040_met <- DK_people %>% filter(PH040 == 2) %>% group_by(ANREC, RB050) %>% summarise(nb = n()) %>% mutate(nb_pond = RB050*nb) %>% ungroup() %>% group_by(ANREC) %>% summarise(POND_NB_MET = sum(nb_pond))
+
+DK_people_agregate_PH040 <- DK_people_agregate_PH040_unmet %>% left_join(DK_people_agregate_PH040_met) %>% mutate(UNMET_RATE = POND_NB_UNMET/POND_NB_MET*100)
+
+AT_people_agregate_PH040_unmet <- AT_people %>% filter(PH040 == 1) %>% group_by(ANREC, RB050) %>% summarise(nb = n()) %>% mutate(nb_pond = RB050*nb) %>% ungroup() %>% group_by(ANREC) %>% summarise(POND_NB_UNMET = sum(nb_pond))
+AT_people_agregate_PH040_met <- AT_people %>% filter(PH040 == 2) %>% group_by(ANREC, RB050) %>% summarise(nb = n()) %>% mutate(nb_pond = RB050*nb) %>% ungroup() %>% group_by(ANREC) %>% summarise(POND_NB_MET = sum(nb_pond))
+
+AT_people_agregate_PH040 <- AT_people_agregate_PH040_unmet %>% left_join(AT_people_agregate_PH040_met) %>% mutate(UNMET_RATE = POND_NB_UNMET/POND_NB_MET*100)
+
+people_agregate_PH040 <- bind_rows(DK = DK_people_agregate_PH040, AT = AT_people_agregate_PH040, .id = "COUNTRY")
+
+
+```
+
+Representation graphique
+```{r graphiques, echo = F}
+ggplot() +
+  geom_line(data = people_agregate_PH040, aes(x = ANREC, y = UNMET_RATE, color= COUNTRY, linetype = COUNTRY)) +
+  scale_color_manual("Countries", values=c("#A63D40", "#90A959"))+
+  theme_light() +
+  theme(legend.position= "none")
+```
