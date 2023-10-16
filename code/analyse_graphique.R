@@ -4,6 +4,7 @@ library(ggrepel)
 library(scales)
 
 # setwd("C:/Users/Tibo/Documents/Demographie/M2S1/UE4 - Traitement de donnees/traitement-donnee-systeme-soin/code")
+# setwd("C:/Users/tibo/Documents/demographie/traitement-donnee-systeme-soin/code")
 
 red_a <- "#A63D40"
 green_a <- "#90A959"
