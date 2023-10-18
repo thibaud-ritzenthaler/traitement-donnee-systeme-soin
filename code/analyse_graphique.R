@@ -38,7 +38,11 @@ AT_people_agregate_PH040 <- AT_people_agregate_PH040_unmet %>%
   mutate(UNMET_RATE = POND_NB_UNMET/(POND_NB_UNMET + POND_NB_MET))
 
 people_agregate_PH040 <- bind_rows(DK = DK_people_agregate_PH040, AT = AT_people_agregate_PH040, .id = "COUNTRY") %>%
-  mutate(LABEL = case_when(ANREC == 2010 & COUNTRY == "DK" ~ "Danemark", ANREC == 2010 & COUNTRY == "AT" ~ "Autriche", TRUE ~ NA_character_))
+  mutate(LABEL = case_when(ANREC == 2010 & COUNTRY == "DK" ~ "Danemark", ANREC == 2010 & COUNTRY == "AT" ~ "Autriche", TRUE ~ NA_character_)) %>%
+  mutate(CONDIDENCE_INTERVAL_MIN = POND_NB_UNMET - (POND_NB_UNMET * 0.05)) %>%
+  mutate(CONDIDENCE_INTERVAL_MAX = POND_NB_UNMET + (POND_NB_UNMET * 0.05)) %>%
+  mutate(CONDIDENCE_INTERVAL_MIN_RATE = CONDIDENCE_INTERVAL_MIN/ (POND_NB_UNMET + POND_NB_MET)) %>%
+  mutate(CONDIDENCE_INTERVAL_MAX_RATE = CONDIDENCE_INTERVAL_MAX/ (POND_NB_UNMET + POND_NB_MET))
 
 
 # PLOTS
@@ -52,6 +56,8 @@ ggplot(people_agregate_PH040) +
     nudge_y = 0.005,
     min.segment.length = 0
   ) +
+  geom_ribbon(aes(x = ANREC, y = UNMET_RATE,ymin=CONDIDENCE_INTERVAL_MIN_RATE,
+                  ymax=CONDIDENCE_INTERVAL_MAX_RATE, fill = COUNTRY), linetype="dotted", alpha=0.1) +
   scale_y_continuous(labels = percent) +
   expand_limits(x=c(2006,2013), y=c(0, 0.08)) +
   xlab("Ann\u00e9e") +
