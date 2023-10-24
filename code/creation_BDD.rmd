@@ -39,7 +39,7 @@ library(questionr)
 # setwd("C:/Users/Tibo/Documents/Demographie/M2S1/UE4 - Traitement de donnees/traitement-donnee-systeme-soin/code")
 
 filter_base_p <- function(country) {
-  return(select(country, PB010, PB030, PB190, PH010, PH020, PH030, PH040, PH050, PH060, PH070))
+  return(select(country, PB010, PB030, PB190, PH010, PH020, PH030, PH040, PH050, PH060, PH070, PE040))
 }
 filter_base_d <- function(country) {
   return(select(country, DB020, DB030))
@@ -75,7 +75,7 @@ AT_household <- data.frame()
 for (i in 2006:2013)  {
   DK_people <- bind_rows(DK_people, import_year_people("DK", i))
   DK_household <- bind_rows(DK_household, import_year_household("DK", i))
-  AT_people <- bind_rows(AT_people, import_year_people("AT", i))
+  AT_people <- bind_rows(AT_people, import_year_people("AT", i) %>% mutate(PE040 = as.character(PE040)))
   AT_household <- bind_rows(AT_household, import_year_household("AT", i))
 }
 ```
