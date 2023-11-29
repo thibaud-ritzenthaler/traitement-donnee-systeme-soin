@@ -1,10 +1,14 @@
 library(tidyverse)
 library(questionr)
-library(ggplot2)
 library(readr)
 library(scales)
 
 setwd("C:/Users/abdel/Desktop/Cours Master/Git_dossier/traitement-donnee-systeme-soin/data/processed")
+setwd("C:/Users/tibo/Documents/demographie/traitement-donnee-systeme-soin/data/processed")
+
+red_a <- "#A63D40"
+green_a <- "#90A959"
+yellow_a <- "#E9B872"
 
 ## On charge la base de l'Autriche et Danemark
 
@@ -130,26 +134,40 @@ Sante_At <- rename(Sante_At, "Sante_perc"="Var1","Annee"="Var2","Effectifs_pond"
 Sante_Dk <- Sante_Dk %>% group_by(Sante_perc) %>% mutate(Variation = ifelse(Annee == 2006, 100 ,(100 +((Effectifs_pond-Effectifs_pond[1]))/(Effectifs_pond[1])*100)))
 
 Sante_At <- Sante_At %>% group_by(Sante_perc) %>% mutate(Variation = ifelse(Annee == 2006, 100 ,(100+((Effectifs_pond-Effectifs_pond[1]))/(Effectifs_pond[1])*100))) 
+iorder()
 
+## Réordonnancement de Sante_Dk$Sante_perc
+Sante_Dk$Sante_perc <- Sante_Dk$Sante_perc %>%
+  fct_relevel(
+    "Bonne ou très bonne", "Ni bonne ni mauvaise", "Mauvaise ou très mauvaise"
+  )
+
+## Réordonnancement de Sante_At$Sante_perc
+Sante_At$Sante_perc <- Sante_At$Sante_perc %>%
+  fct_relevel(
+    "Bonne ou très bonne", "Ni bonne ni mauvaise", "Mauvaise ou très mauvaise"
+  )
 ## Intervalle de confiance 
 
 ### On trace les graphiques de variation de l'état de perçu 
 
 ggplot(Sante_Dk, aes(x = Annee, y = Variation, color = Sante_perc, group = Sante_perc )) +
-  geom_point() +
-  geom_line()+
-  xlab("Annee") +
-  ylab("Variation") +
-  theme_light() #+
-  #theme(legend.position= "none")
+  geom_point(shape = 3, size = 3) +
+  geom_line(size = 1.5)+
+  scale_color_manual("Santé perçue", values=c(green_a, yellow_a, red_a))+
+  xlab("Année") +
+  ylab("Variation (points)") +
+  theme_light() +
+  theme(legend.position= c(.15, .9))
 
 ggplot(Sante_At, aes(x = Annee, y = Variation, color = Sante_perc, group = Sante_perc )) +
-  geom_point() +
-  geom_line()+
-  xlab("Annee") +
-  ylab("Variation") +
-  theme_light() #+
-#theme(legend.position= "none")
+  geom_point(shape = 3, size = 3) +
+  geom_line(size = 1.5)+
+  scale_color_manual("Santé perçue", values=c(green_a, yellow_a, red_a))+
+  xlab("Année") +
+  ylab("Variation (points)") +
+  theme_light() +
+  theme(legend.position= c(.15, .9))
 
 
 
@@ -178,18 +196,19 @@ ggplot(Sante_At, aes(x = Annee, y = Effectifs_pond, color = Sante_perc, group = 
   ylab("Effectifs") +
   theme_light() #+
 
-
+Sante_join <- bind_rows(Autriche = Sante_At, Danemark = Sante_Dk, .id = "Pays")
+Sante_At <- mutate(Sante_At, Pays = "Autriche")
+Sante_Dk <- mutate(Sante_Dk, Pays = "Danemark")
 ggplot() + 
-  geom_point(data= Sante_At,aes(x = Annee, y = Pourcentage, color = Sante_perc, group = Sante_perc )) +
-  geom_point(data= Sante_Dk,aes(x = Annee, y = Pourcentage, color = Sante_perc, group = Sante_perc )) +
-  geom_point() +
-  geom_line(data= Sante_At,aes(x = Annee, y = Pourcentage, color = Sante_perc, group = Sante_perc,linetype ="dotdash"), size = 1.5) +
-  geom_line(data= Sante_Dk,aes(x = Annee, y = Pourcentage, color = Sante_perc, group = Sante_perc,linetype ="dotted"), size = 1.5) +
-  scale_y_continuous(labels = percent) +
+  geom_line(data= Sante_At, aes(x = Annee, y = Pourcentage, color = Sante_perc, group = Sante_perc,linetype =Pays), size = 1.5) +
+  geom_line(data= Sante_Dk, aes(x = Annee, y = Pourcentage, color = Sante_perc, group = Sante_perc,linetype =Pays), size = 1.5) +
+  scale_y_continuous(n.breaks=14, labels = percent) +
+  scale_color_manual("Santé perçue", values=c(green_a, yellow_a, red_a))+
+  # scale_linetype_manual("Pays", values =c("dotdash", "dotted"))+
   xlab("Annee") +
   ylab("Effectifs") +
-  theme_light() #+
-
+  theme_light()  +
+  theme(legend.position= c(.1, .7))
 
 
 

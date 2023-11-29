@@ -47,7 +47,7 @@ people_agregate_PH040 <- bind_rows(DK = DK_people_agregate_PH040, AT = AT_people
 
 # PLOTS
 ggplot(people_agregate_PH040) +
-  geom_line(aes(x = ANREC, y = UNMET_RATE, color= COUNTRY, linetype = COUNTRY)) +
+  geom_line(aes(x = ANREC, y = UNMET_RATE, color= COUNTRY, linetype = COUNTRY),size = 1.5) +
   scale_color_manual("Countries", values=c(red_a, green_a))+
   geom_label_repel(aes(x = ANREC, y = UNMET_RATE, label = LABEL),
     parse = TRUE,
@@ -59,6 +59,7 @@ ggplot(people_agregate_PH040) +
   geom_ribbon(aes(x = ANREC, y = UNMET_RATE,ymin=CONDIDENCE_INTERVAL_MIN_RATE,
                   ymax=CONDIDENCE_INTERVAL_MAX_RATE, fill = COUNTRY), linetype="dotted", alpha=0.1) +
   scale_y_continuous(labels = percent) +
+  scale_fill_manual("Countries", values=c(red_a, green_a))+
   expand_limits(x=c(2006,2013), y=c(0, 0.08)) +
   xlab("Ann\u00e9e") +
   ylab("Taux de soin non-satisfait (\u0025)") +
