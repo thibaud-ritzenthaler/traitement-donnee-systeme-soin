@@ -54,6 +54,7 @@ Danemark <- rename(Danemark,
 
 ## On regarde la distribution des variables en fonction de l'année de réponse
 Danemark<- Danemark %>% mutate(Age=ANN_REC-ANAI)
+Autriche <- Autriche %>% mutate(Age=ANN_REC-ANAI)
 Sante_At <- table(Danemark$Age)
 View(Sante_At)                   
                    
@@ -227,23 +228,33 @@ prop.table(wtd.table(Danemark$SANTE_PERC,Danemark$UNMET_MED,w=Danemark$Poids),ma
 ## Voir les structures de pop (sexe, age, diplome/statut, santé générale (maladie chro / handicap))
 
 ## Le faire en descriptif ( chi 2)
-Autriche <- Autriche %>% filter(UNMET_MED %in% c(1,2))
-Danemark <- Danemark %>% filter(UNMET_MED %in% c(1,2))
+Autriche <- Autriche %>% filter(UNMET_MED %in% c("1","2"))
+Danemark <- Danemark %>% filter(UNMET_MED %in% c("1","2"))
 
-Model_Aut <- glm(relevel(as.factor(UNMET_MED),ref=2)~as.factor(ANN_REC),
-                 family = binomial(logit),
-                 data = Autriche)
-odds.ratio(Model_Aut)
-
-Model_Dk <- glm(relevel(as.factor(UNMET_MED),ref=2)~ as.factor(ANN_REC),
+Model_Aut <- glm(relevel(as.factor(UNMET_MED),ref=2)~as.factor(SANTE_PERC),
                  family = binomial(logit),
                  data = Danemark)
-odds.ratio(Model_Dk)
+odds.ratio(Model_Aut)
 
-Mod_Dk_2 <- glm(relevel(as.factor(UNMET_MED),ref=2)~as.factor(SEXE),
+Model_2 <- glm(relevel(as.factor(UNMET_MED),ref=2)~ relevel(as.factor(DIPL),ref="Diplôme du supérieur"),
+                 family = binomial(logit),
+                 data = Danemark)
+odds.ratio(Model_2)
+
+ Mod_Dk_2 <- glm(relevel(as.factor(UNMET_MED),ref=2)~as.factor(SEXE),
                  family = binomial(logit),
                  data = Danemark)
 odds.ratio(Mod_Dk_2)
+
+Mod_Dk_2 <- glm(relevel(as.factor(UNMET_MED),ref=2)~relevel(as.factor(HANDI),ref="Pas de handicap"),
+                family = binomial(logit),
+                data = Danemark)
+drop1(Mod_Dk_2,test="Chisq")
+## Proba 0,8 que les mariés ait déclaré ne pas avoir eu recours à un soin en 2009 plutot qu'un celib au danemarkn 1,4 pour le handicap lourd plutôt que léger
+
+Mod_Dk_2 <- glm(relevel(as.factor(UNMET_MED),ref=2)~relevel(as.factor(HANDI),ref="Pas de handicap"),
+                family = binomial(logit),
+                data = Danemark)
 ## Années confondues
 ## Pour l'Autriche, il y'a 11 % de chances de se tromper en affirmant que les femmes ont 1,07 fois plus de chances 
 ## de ne pas avoir recours à un soin médical comparé aux hommes. Pour le Danemark ces probas sont identiques (non significatives)
@@ -253,7 +264,7 @@ odds.ratio(Mod_Dk_2)
 ## On regarde en fonction du niveau de diplôme pour l'Autriche 
 
 ## On regroupe les modalités DIPL
-Autriche$DIPL[Autriche$DIPL %in% c("0","1","2")] <- "Collège ou avant"
+Autriche$DIPL[Autriche$DIPL %in% c("0-1","0","1","2")] <- "Collège ou avant"
 Autriche$DIPL[Autriche$DIPL %in% c("3","4")] <- "Lycée"
 Autriche$DIPL[Autriche$DIPL %in% c("5","6")] <- "Diplôme du supérieur"
 
@@ -336,25 +347,8 @@ Mod_Aut_4 <- glm(relevel(as.factor(UNMET_MED),ref=2)~ relevel(as.factor(STATUT_M
 odds.ratio(Mod_Aut_4)
 drop1(Mod_Aut_4,test="Chisq")
 
-## ACP si ça marche
+Model_au <- glm(relevel(as.factor(UNMET_MED),ref=2)~as.factor(ANREC),
+                family=binomial(logit),
+                data= Autriche)
 
-Autriche <- Autriche %>% filter(UNMET_MED %in% c("1","2") & ANN_REC =="2009") 
-Danemark <- Danemark %>% filter(UNMET_MED %in% c("1","2") & ANN_REC =="2009")
-Test<- Danemark %>% column_to_rownames(var="ID")
 
-ACP <- PCA(Test,scale.unit=TRUE)
-
-##On va essayer de caractériser les joueurs en fonction de leur capacités physiques et sportives : est ce que certaines caractéristiques sont 
-## liées et existe t-il différents groupes de joueurs? 
-
-## Matrice des corrélations 
-round(cor(R),digits=2)
-
-##Tableau des valeurs propres
-get_eig(ACP)
-
-##Représentation des valeurs propres
-fviz_eig(ACP,
-         addlabels=T)
-##Taux d'inertie moyen : le nombre d'axe à conserver :ceux qui sont au dessus de 16,67
-100/6
